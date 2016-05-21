@@ -222,4 +222,20 @@ $(function () {
         //todo: Implement here
         //display game UI for empty game
     }
+
+    game.client.guessResult = function (guess, near, exact) {
+        //TODO: Show results of guess
+        //guess = string
+        //near = int, number of near tags
+        //exact = int, number of exact tags
+        alert(guess);
+        alert(near);
+        alert(exact);
+    };
+
+    game.client.endGame = function (winners) {
+        //TODO: End game - Show winners
+        //winners = array of strings
+    };
+    
 });

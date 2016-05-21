@@ -481,6 +481,7 @@ namespace AxiomMind
             }
             _rooms[room].HasGame = false;
 
+            Clients.Group(room).endGame(winners);
             Clients.Group(room).addMessage(0, "AxiomMind", $"**** END OF GAME ****");
             if (winners.Count > 0)
                 Clients.Group(room).addMessage(0, "AxiomMind", $"Our winner{(winners.Count > 1 ? "s" : "")} {(winners.Count > 1 ? "are" : "is")}: {string.Join<string>(" and ", winners)}");
@@ -522,6 +523,7 @@ namespace AxiomMind
                     Clients.Client(recipientId).addMessage(0, "AxiomMind", $"Your guess {result.Guess} had {result.Exactly} exact match(es) and {result.Near} near match(es).");
                     if (result.Exactly == 8)
                         winners.Add(result.UserName);
+                    Clients.Client(recipientId).guessResult(result.Guess, result.Near, result.Exactly);
                 }
             }
             if (winners.Count == 0)
