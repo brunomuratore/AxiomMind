@@ -64,13 +64,16 @@ namespace AxiomMind.Models
             else
             {
                 string remainingUsers = "";
-                foreach (var user in Users)
+                lock(Users)
                 {
-                    if (!CurrentUsersGuessed.Contains(user))
-                        remainingUsers += user + ", ";
+                    foreach (var user in Users)
+                    {
+                        if (!CurrentUsersGuessed.Contains(user))
+                            remainingUsers += user + ", ";
+                    }
+                    if (remainingUsers.Length > 0)
+                        RemainingUsers = remainingUsers.Remove(remainingUsers.LastIndexOf(','));
                 }
-                if (remainingUsers.Length > 0)
-                    RemainingUsers = remainingUsers.Remove(remainingUsers.LastIndexOf(','));
                 
                 return false;
             }
@@ -81,9 +84,12 @@ namespace AxiomMind.Models
             var results = new List<GuessResult>();
             Round++;
 
-            foreach (var guess in Guesses)
+            lock(Guesses)
             {
-                results.Add(AnalyzeGuess(guess.Value, guess.Key));                
+                foreach (var guess in Guesses)
+                {
+                    results.Add(AnalyzeGuess(guess.Value, guess.Key));
+                }
             }
 
             Guesses = new Dictionary<string, string>();

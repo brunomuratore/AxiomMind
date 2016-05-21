@@ -85,21 +85,19 @@ namespace AxiomMind
             ChatUser user = _users.Values.FirstOrDefault(u => u.ConnectionId == Context.ConnectionId);
             if (user != null)
             {
+                var room = _userRooms[user.Name];
+                LeaveGame(user.Name, room);
+
                 ChatUser ignoredUser;
                 _users.TryRemove(user.Name, out ignoredUser);
 
-                // Leave all rooms
-                string ignoredRoom;
-                if (_userRooms.TryGetValue(user.Name, out ignoredRoom))
-                {
-                    Clients.Group(ignoredRoom).leave(user);
-                    ChatRoom chatRoom = _rooms[ignoredRoom];
-                    chatRoom.Users.Remove(user.Name);
-                }
+                Clients.Group(room).leave(user);
+                ChatRoom chatRoom = _rooms[room];
+                chatRoom.Users.Remove(user.Name);
+
                 UpdateRooms();
 
-                _userRooms.TryRemove(user.Name, out ignoredRoom);
-                LeaveGame(user.Name, ignoredRoom);
+                _userRooms.TryRemove(user.Name, out room);
             }
 
             return null;
@@ -162,9 +160,12 @@ namespace AxiomMind
                 return;
             }
 
-            foreach (var user in _rooms[roomName].Users)
+            lock(_users)
             {
-                _users[user].CurrentGame = game.Guid;
+                foreach (var user in _rooms[roomName].Users)
+                {
+                    _users[user].CurrentGame = game.Guid;
+                }
             }
 
             _rooms[roomName].HasGame = true;
@@ -265,7 +266,7 @@ namespace AxiomMind
                     _rooms[r].Users.Remove(name);
                     _rooms[r].Users.Add(newUserName);
                     Clients.Group(r).changeUserName(oldUser, newUser);
-                    
+
                     string ignoredRoom;
                     ChatUser ignoredUser;
                     _userRooms.TryRemove(name, out ignoredRoom);
@@ -370,7 +371,7 @@ namespace AxiomMind
                 Clients.Caller.addMessage(0, "AxiomMind", "Use '/join room' to join a room.");
                 return false;
             }
-            
+
             if (_userRooms[name] != room)
             {
                 SendError(String.Format("You're not in '{0}'. Use '/join {0}' to join it.", room));
@@ -456,11 +457,13 @@ namespace AxiomMind
         {
             _games.TryRemove(game.Guid, out game);
 
-            foreach (var user in _rooms[room].Users)
+            lock (_users)
             {
-                _users[user].CurrentGame = "";
+                foreach (var user in _rooms[room].Users)
+                {
+                    _users[user].CurrentGame = "";
+                }
             }
-
             _rooms[room].HasGame = false;
 
             Clients.Group(room).addMessage(0, "AxiomMind", $"**** END OF GAME ****");
@@ -496,12 +499,15 @@ namespace AxiomMind
         private void EndRound(Game game, string room)
         {
             List<string> winners = new List<string>();
-            foreach (var result in game.RoundOver())
+            lock(_users)
             {
-                string recipientId = _users[result.UserName].ConnectionId;
-                Clients.Client(recipientId).addMessage(0, "AxiomMind", $"Your guess {result.Guess} had {result.Exactly} exact match(es) and {result.Near} near match(es).");
-                if (result.Exactly == 8)
-                    winners.Add(result.UserName);
+                foreach (var result in game.RoundOver())
+                {
+                    string recipientId = _users[result.UserName].ConnectionId;
+                    Clients.Client(recipientId).addMessage(0, "AxiomMind", $"Your guess {result.Guess} had {result.Exactly} exact match(es) and {result.Near} near match(es).");
+                    if (result.Exactly == 8)
+                        winners.Add(result.UserName);
+                }
             }
             if (winners.Count == 0)
                 StartRound(game.Round, room);

@@ -15,7 +15,8 @@
         <span class="message" id="m-${id}">
             <strong>${name}:</strong>
             {{html message}}
-        </span><br/>
+        </span>
+        <br />
     </script>
     <script id="new-user-template" type="text/x-jquery-tmpl">
         <span class="user" id="u-${name}">
@@ -31,9 +32,23 @@
 <body>
     <div id="chat-area">
         <div id="game" class="leftPanel">
-                <div id="gameContent">asd</div>
+            <div id="gameContent">
+                <table>
+                    <thead>
+                        <tr>
+                            <td>Round</td>
+                            <td>Guess</td>
+                            <td>Exact</td>
+                            <td>Near</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div id="rooms" class="rightPanel">        
+        <div id="rooms" class="rightPanel">
             <div id="roomsContainer">
                 <div class="title">Rooms</div><br />
             </div>
