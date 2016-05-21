@@ -175,6 +175,14 @@ namespace AxiomMind
             return true;
         }
 
+        public void SendGuess(string guess)
+        {
+            string room = Clients.Caller.room;
+            string name = Clients.Caller.name;
+
+            Guess(name, room, guess);
+        }
+
         #endregion
 
         #region Private Chat
@@ -409,12 +417,12 @@ namespace AxiomMind
             Clients.Group(roomName).addMessage(0, "AxiomMind", $"Make your guess typing \"/guess 12345678\"");
         }
 
-        private void Guess(string name, string room, string guess)
+        private bool Guess(string name, string room, string guess)
         {
             if (guess.Length != 8)
             {
                 SendError("Your guess must have 8 characters");
-                return;
+                return false;
             }
 
             byte[] g = new byte[8];
@@ -424,7 +432,7 @@ namespace AxiomMind
                 if (guess[i] - '0' <= 0 || guess[i] - '0' > 8)
                 {
                     SendError("Your guess must contain only digitis from 1 to 8.");
-                    return;
+                    return false;
                 }
 
                 g[i] = (byte)(guess[i] - '0');
@@ -435,7 +443,7 @@ namespace AxiomMind
             if (String.IsNullOrEmpty(gameId))
             {
                 SendError("You are not in a game.");
-                return;
+                return false;
             }
 
             Game game = _games[gameId];
@@ -452,7 +460,12 @@ namespace AxiomMind
                 }
             }
             else
+            {
                 SendError("You have already sent your guess this round. Please wait for the other playsers.");
+                return false;
+            }
+
+            return true;
         }
 
         private void EndGame(List<string> winners, string room, Game game)
