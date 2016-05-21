@@ -87,8 +87,7 @@ $(function () {
         }
 
         var data = {
-            name: user.Name,
-            hash: user.Hash
+            name: user.Name
         };
 
         var e = $('#new-user-template').tmpl(data)
@@ -122,8 +121,7 @@ $(function () {
     game.client.changeUserName = function (oldUser, newUser) {
         $('#u-' + oldUser.Name).replaceWith(
                 $('#new-user-template').tmpl({
-                    name: newUser.Name,
-                    hash: newUser.Hash
+                    name: newUser.Name
                 })
         );
         refreshUsers();
@@ -135,14 +133,6 @@ $(function () {
         else {
             addMessage(oldUser.Name + '\'s nick has changed to ' + newUser.Name, 'notification');
         }
-    };
-
-    game.client.sendMeMessage = function (name, message) {
-        addMessage('*' + name + '* ' + message, 'notification');
-    };
-
-    game.client.sendPrivateMessage = function (from, to, message) {
-        addMessage('<emp>*' + from + '*</emp> ' + message, 'pm');
     };
 
     game.client.leave = function (user) {

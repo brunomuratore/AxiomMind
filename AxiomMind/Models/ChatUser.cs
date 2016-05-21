@@ -12,16 +12,15 @@ namespace AxiomMind.Models
         public string ConnectionId { get; set; }
         public string Id { get; set; }
         public string Name { get; set; }
-        public string Hash { get; set; }
+        public string CurrentGame { get; set; }
 
         public ChatUser()
         {
         }
 
-        public ChatUser(string name, string hash)
+        public ChatUser(string name)
         {
             Name = name;
-            Hash = hash;
             Id = Guid.NewGuid().ToString("d");
         }
     }

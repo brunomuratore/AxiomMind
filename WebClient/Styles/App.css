@@ -88,6 +88,11 @@
     width: 100%;
 }
 
+span.room{
+    width: 80%;
+    float:left;
+}
+
 .error 
 {
     color:Red;

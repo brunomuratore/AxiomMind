@@ -94,6 +94,7 @@
     <Compile Include="GameHub.cs" />
     <Compile Include="Models\ChatMessage.cs" />
     <Compile Include="Models\ChatRoom.cs" />
+    <Compile Include="Models\GuessResult.cs" />
     <Compile Include="Models\Game.cs" />
     <Compile Include="Models\ChatUser.cs" />
     <Compile Include="Program.cs" />
