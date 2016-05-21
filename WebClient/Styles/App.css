@@ -23,6 +23,12 @@
     height:200px;
 }
 
+.title{
+    font-weight:bold;
+    background-color: blanchedalmond;
+    font-size: 16px;
+    text-align:center
+}
 
 .leftPanel
 {
@@ -32,6 +38,7 @@
     overflow: auto;
     margin-left: 0px;
     padding-left: 0px;
+    margin-bottom: 15px;
 }
 
 .leftPanel li
@@ -52,9 +59,10 @@
     overflow: auto;
     font-size: small;
     white-space: nowrap;
+    margin-bottom: 15px;
 }
 
-.rightPanel li
+.rightPanel li, .rightPanel span
 {
     padding: 4px;
 }
@@ -70,6 +78,14 @@
     width: 70%;
     padding: 5px;
     border: 1px solid #ccc;
+}
+
+#roomsContainer{
+    height: 370px;
+}
+
+#btnStartGame{
+    width: 100%;
 }
 
 .error 

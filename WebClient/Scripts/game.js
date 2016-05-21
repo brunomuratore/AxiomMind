@@ -3,7 +3,7 @@
 /// <reference path="../../Scripts/jquery.cookie.js" />
 
 $(function () {
-    var chat = $.connection.chat;
+    var game = $.connection.gameHub;
 
     function clearMessages() {
         $('#messages').html('');
@@ -13,6 +13,7 @@ $(function () {
 
     function clearUsers() {
         $('#users').html('');
+        $('<div class="title">Users in your room</div><br />').appendTo($('#users'));
     }
 
     function refreshUsers() { refreshList($('#users')); }
@@ -35,14 +36,14 @@ $(function () {
         return e;
     }
 
-    chat.client.refreshRoom = function (room) {
+    game.client.refreshRoom = function (room) {
         clearMessages();
         clearUsers();
 
-        chat.server.getUsers()
+        game.server.getUsers()
             .done(function (users) {
                 $.each(users, function () {
-                    chat.client.addUser(this, true);
+                    game.client.addUser(this, true);
                 });
                 refreshUsers();
 
@@ -52,20 +53,20 @@ $(function () {
         addMessage('Entered ' + room, 'notification');
     };
 
-    chat.client.showRooms = function (rooms) {
+    game.client.showRooms = function (rooms) {
         $.each(rooms, function () {
-            chat.client.addRoom(this, true);
+            game.client.addRoom(this, true);
         });        
     };
 
-    chat.client.addMessageContent = function (id, content) {
+    game.client.addMessageContent = function (id, content) {
         var e = $('#m-' + id).append(content);
         refreshMessages();
         updateUnread();
         e[0].scrollIntoView();
     };
 
-    chat.client.addMessage = function (id, name, message) {
+    game.client.addMessage = function (id, name, message) {
         var data = {
             name: name,
             message: message,
@@ -79,7 +80,7 @@ $(function () {
         e[0].scrollIntoView();
     };
 
-    chat.client.addUser = function (user, exists) {
+    game.client.addUser = function (user, exists) {
         var id = 'u-' + user.Name;
         if (document.getElementById(id)) {
             return;
@@ -102,7 +103,7 @@ $(function () {
         updateCookie();
     };
 
-    chat.client.addRoom = function (room, exists) {
+    game.client.addRoom = function (room, exists) {
         var id = 'u-' + room.Name;
         
         var data = {
@@ -115,10 +116,10 @@ $(function () {
         if(el)
             $('#' + id).replaceWith(newEl);
         else
-            newEl.appendTo($('#rooms'));
+            newEl.appendTo($('#roomsContainer'));
     };
     
-    chat.client.changeUserName = function (oldUser, newUser) {
+    game.client.changeUserName = function (oldUser, newUser) {
         $('#u-' + oldUser.Name).replaceWith(
                 $('#new-user-template').tmpl({
                     name: newUser.Name,
@@ -136,15 +137,15 @@ $(function () {
         }
     };
 
-    chat.client.sendMeMessage = function (name, message) {
+    game.client.sendMeMessage = function (name, message) {
         addMessage('*' + name + '* ' + message, 'notification');
     };
 
-    chat.client.sendPrivateMessage = function (from, to, message) {
+    game.client.sendPrivateMessage = function (from, to, message) {
         addMessage('<emp>*' + from + '*</emp> ' + message, 'pm');
     };
 
-    chat.client.leave = function (user) {
+    game.client.leave = function (user) {
         if (this.state.id != user.Id) {
             $('#u-' + user.Name).fadeOut('slow', function () {
                 $(this).remove();
@@ -157,7 +158,7 @@ $(function () {
     $('#send-message').submit(function () {
         var command = $('#new-message').val();
 
-        chat.server.send(command)
+        game.server.send(command)
             .fail(function (e) {
                 addMessage(e, 'error');
             });
@@ -169,36 +170,36 @@ $(function () {
     });
 
     $(window).blur(function () {
-        chat.state.focus = false;
+        game.state.focus = false;
     });
 
     $(window).focus(function () {
-        chat.state.focus = true;
-        chat.state.unread = 0;
-        document.title = 'SignalR Chat';
+        game.state.focus = true;
+        game.state.unread = 0;
+        document.title = 'SignalR game';
     });
 
     function updateUnread() {
-        if (!chat.state.focus) {
-            if (!chat.state.unread) {
-                chat.state.unread = 0;
+        if (!game.state.focus) {
+            if (!game.state.unread) {
+                game.state.unread = 0;
             }
-            chat.state.unread++;
+            game.state.unread++;
         }
         updateTitle();
     }
 
     function updateTitle() {
-        if (chat.state.unread == 0) {
-            document.title = 'SignalR Chat';
+        if (game.state.unread == 0) {
+            document.title = 'SignalR game';
         }
         else {
-            document.title = 'SignalR Chat (' + chat.state.unread + ')';
+            document.title = 'SignalR game (' + game.state.unread + ')';
         }
     }
 
     function updateCookie() {
-        $.cookie('userid', chat.state.id, { path: '/', expires: 30 });
+        $.cookie('userid', game.state.id, { path: '/', expires: 30 });
     }
 
     addMessage('Welcome to AxiomMind.', 'notification');
@@ -209,12 +210,16 @@ $(function () {
     $.connection.hub.url = "http://localhost:8080/signalr";
     $.connection.hub.logging = true;
     $.connection.hub.start({ transport: 'auto' }, function () {
-        chat.server.join()
+        game.server.join()
             .done(function (success) {
                 if (success === false) {
                     $.cookie('userid', '');
                     addMessage('To start, choose a name typing "/nick nickname".', 'notification');                    
                 }
             });
+    });
+
+    $("#btnStartGame").click(function () {
+        game.server.start();
     });
 });
