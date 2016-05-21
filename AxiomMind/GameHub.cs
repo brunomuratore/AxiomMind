@@ -129,12 +129,12 @@ namespace AxiomMind
         #endregion
 
         #region Public Game
-        public void Start()
+        public bool Start()
         {
             if (!EnsureUserAndRoom())
             {
                 SendError("You need to have a nickName to start a game.");
-                return;
+                return false;
             }
 
             string roomName = Clients.Caller.room;
@@ -143,13 +143,13 @@ namespace AxiomMind
             if (_rooms[roomName].HasGame)
             {
                 SendError("You can't start a game here. This room already has a game in progress.");
-                return;
+                return false;
             }
 
             if (!String.IsNullOrEmpty(_users[name].CurrentGame))
             {
                 SendError("Game could not be started. You are already in a game.");
-                return;
+                return false;
             }
 
             Game game = new Game(_rooms[roomName].Users);
@@ -157,7 +157,7 @@ namespace AxiomMind
             if (!_games.TryAdd(game.Guid, game))
             {
                 SendError("Game could not be started. Please try again.");
-                return;
+                return false;
             }
 
             lock(_users)
@@ -171,6 +171,8 @@ namespace AxiomMind
             _rooms[roomName].HasGame = true;
             Clients.Group(roomName).addMessage(0, "AxiomMind", $"User {name} has started a game for {_rooms[roomName].Users.Count()} users.");
             StartRound(game.Round, roomName);
+
+            return true;
         }
 
         #endregion

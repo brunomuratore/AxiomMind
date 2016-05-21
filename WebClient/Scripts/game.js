@@ -210,6 +210,16 @@ $(function () {
     });
 
     $("#btnStartGame").click(function () {
-        game.server.start();
+        game.server.start()
+            .done(function (success) {
+                if (success === true) {
+                    gameCreated();
+                }
+            });
     });
+
+    function gameCreated() {
+        //todo: Implement here
+        //display game UI for empty game
+    }
 });
