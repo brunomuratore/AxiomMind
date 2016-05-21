@@ -148,12 +148,17 @@ namespace AxiomMind
             string roomName = Clients.Caller.room;
             string name = Clients.Caller.name;
 
+            if (_rooms[roomName].HasGame)
+            {
+                SendError("You can't start a game here. This room already has a game in progress.");
+                return;
+            }
+
             if (!String.IsNullOrEmpty(_users[name].CurrentGame))
             {
                 SendError("Game could not be started. You are already in a game.");
                 return;
             }
-
 
             Game game = new Game(_rooms[roomName].Users);
 
@@ -168,6 +173,7 @@ namespace AxiomMind
                 _users[user].CurrentGame = game.Guid;
             }
 
+            _rooms[roomName].HasGame = true;
             Clients.Group(roomName).addMessage(0, "AxiomMind", $"User {name} has started a game for {_rooms[roomName].Users.Count()} users.");
             StartRound(game.Round, roomName);
         }
@@ -230,11 +236,16 @@ namespace AxiomMind
 
                         return true;
                     }
+                    else if (commandName.Equals("leaveGame", StringComparison.OrdinalIgnoreCase))
+                    {
+                        LeaveGame(name, room);
+                        return true;
+                    }
                 }
             }
             return false;
         }
-
+        
         private bool ChangeNickName(string name, string room, string newUserName)
         {            
             if (!_users.ContainsKey(newUserName))
@@ -313,11 +324,20 @@ namespace AxiomMind
                 Groups.Remove(Context.ConnectionId, room);
             }
 
-            _userRooms[name].Add(newRoom);
-            if (!chatRoom.Users.Add(name))
+            if (room != "" && _rooms[room].Users.Contains(name))
             {
                 SendError("You're already in that room!");
+                return false;
             }
+
+            if (!String.IsNullOrEmpty(_users[name].CurrentGame))
+            {
+                SendError("You can leave a room while you are in a game! You can leave a game by typing /leaveGame");
+                return false;
+            }
+
+            _userRooms[name].Add(newRoom);
+            chatRoom.Users.Add(name);
 
             Clients.Group(newRoom).addUser(_users[name]);
 
@@ -432,18 +452,7 @@ namespace AxiomMind
             {
                 if (game.MakeGuess(guess, name))
                 {
-                    List<string> winners = new List<string>();
-                    foreach (var result in game.RoundOver())
-                    {
-                        string recipientId = _users[result.UserName].ConnectionId;
-                        Clients.Client(recipientId).addMessage(0, "AxiomMind", $"Your guess {result.Guess} had {result.Exactly} exact match(es) and {result.Near} near match(es).");
-                        if (result.Exactly == 8)
-                            winners.Add(result.UserName);
-                    }
-                    if (winners.Count == 0)
-                        StartRound(game.Round, room);
-                    else
-                        EndGame(winners, room, game);
+                    EndRound(game, room);
                 }
                 else
                 {
@@ -463,10 +472,53 @@ namespace AxiomMind
                 _users[user].CurrentGame = "";
             }
 
+            _rooms[room].HasGame = false;
+
             Clients.Group(room).addMessage(0, "AxiomMind", $"**** END OF GAME ****");
-            Clients.Group(room).addMessage(0, "AxiomMind", $"Our winner{(winners.Count > 1 ? "s" : "")} {(winners.Count > 1 ? "are" : "is")}: {string.Join<string>(" and ", winners)}");
+            if(winners.Count > 0)
+                Clients.Group(room).addMessage(0, "AxiomMind", $"Our winner{(winners.Count > 1 ? "s" : "")} {(winners.Count > 1 ? "are" : "is")}: {string.Join<string>(" and ", winners)}");
         }
 
+        private void LeaveGame(string name, string room)
+        {
+            var gameId = _users[name].CurrentGame;
+            if (String.IsNullOrEmpty(gameId))
+            {
+                SendError("You are not in a game.");
+                return;
+            }
+
+            _games[gameId].Removeuser(name);
+            if(!_games[gameId].HasUsers())
+            {
+                EndGame(new List<string>(), room, _games[gameId]);
+            }
+            else if (_games[gameId].HasHoRemainingUsers())
+            {
+                EndRound(_games[gameId], room);
+            }
+
+            _users[name].CurrentGame = "";
+            
+            Clients.Group(room).addMessage(0, "AxiomMind", $"{name} has left the game.");
+        }
+
+
+        private void EndRound(Game game, string room)
+        {
+            List<string> winners = new List<string>();
+            foreach (var result in game.RoundOver())
+            {
+                string recipientId = _users[result.UserName].ConnectionId;
+                Clients.Client(recipientId).addMessage(0, "AxiomMind", $"Your guess {result.Guess} had {result.Exactly} exact match(es) and {result.Near} near match(es).");
+                if (result.Exactly == 8)
+                    winners.Add(result.UserName);
+            }
+            if (winners.Count == 0)
+                StartRound(game.Round, room);
+            else
+                EndGame(winners, room, game);
+        }
         #endregion
 
     }

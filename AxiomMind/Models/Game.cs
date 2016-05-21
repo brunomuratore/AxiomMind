@@ -124,5 +124,21 @@ namespace AxiomMind.Models
 
             return result;
         }
+
+        internal void Removeuser(string name)
+        {
+            Users.Remove(name);
+            Guesses.Remove(name);
+        }
+
+        internal bool HasUsers()
+        {
+            return Users.Count > 0;
+        }
+
+        internal bool HasHoRemainingUsers()
+        {
+            return Guesses.Count() == Users.Count();
+        }
     }
 }
