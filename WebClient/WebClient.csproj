@@ -66,6 +66,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Bot.html" />
     <Content Include="packages.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -77,6 +78,7 @@
   <ItemGroup>
     <None Include="Scripts\jquery-1.6.4-vsdoc.js" />
     <Content Include="Index.html" />
+    <Content Include="Scripts\bot.js" />
     <Content Include="Scripts\game.js" />
     <Content Include="Scripts\jquery-1.6.4.js" />
     <Content Include="Scripts\jquery-1.6.4.min.js" />

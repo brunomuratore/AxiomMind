@@ -59,13 +59,6 @@ $(function () {
         });        
     };
 
-    game.client.addMessageContent = function (id, content) {
-        var e = $('#m-' + id).append(content);
-        refreshMessages();
-        updateUnread();
-        e[0].scrollIntoView();
-    };
-
     game.client.addMessage = function (id, name, message) {
         var data = {
             name: name,
@@ -228,9 +221,6 @@ $(function () {
         //guess = string
         //near = int, number of near tags
         //exact = int, number of exact tags
-        alert(guess);
-        alert(near);
-        alert(exact);
     };
 
     game.client.endGame = function (winners) {
