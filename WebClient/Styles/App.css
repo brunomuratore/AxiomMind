@@ -1,0 +1,93 @@
+﻿body
+{
+    font-family: Trebuchet MS;
+    font-size: 13px;
+}
+
+#gameContent{
+    height:100%;
+    width:100%;
+}
+
+#game{
+    height:400px;
+}
+#rooms{
+    height:400px;
+}
+
+#messages{
+    height:200px;
+}
+#users{
+    height:200px;
+}
+
+
+.leftPanel
+{
+    width: 70%;
+    border: 1px solid #ccc;
+    float: left;
+    overflow: auto;
+    margin-left: 0px;
+    padding-left: 0px;
+}
+
+.leftPanel li
+{
+    list-style-type: none;
+    padding: 3px;
+}
+
+.rightPanel
+{
+    width: 17%;
+    border-right: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    float: left;
+    margin-left: 0px;
+    padding-left: 0px;
+    overflow: auto;
+    font-size: small;
+    white-space: nowrap;
+}
+
+.rightPanel li
+{
+    padding: 4px;
+}
+
+.clear
+{
+    clear: both;
+}
+
+#new-message
+{
+    font-family: Trebuchet MS;
+    width: 70%;
+    padding: 5px;
+    border: 1px solid #ccc;
+}
+
+.error 
+{
+    color:Red;
+}
+
+.pm
+{
+    color:Red;
+}
+
+.notification
+{
+    color:#bbb;
+}
+
+.message
+{
+    
+}
