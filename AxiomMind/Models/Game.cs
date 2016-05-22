@@ -17,6 +17,10 @@ namespace AxiomMind.Models
         public string RemainingUsers { get; private set; }
         public bool HasBot { get; set; }
 
+        /// <summary>
+        /// Creates a new game containing all the provided users.
+        /// </summary>
+        /// <param name="users">A hashset containing the nickname of all players that will participate in the game.</param>
         public Game(HashSet<string> users)
         {
             this.Guid = System.Guid.NewGuid().ToString();
@@ -35,19 +39,13 @@ namespace AxiomMind.Models
             }
         }
 
-        private string GetNewCode()
-        {
-            var code = "";
-            Random r = new Random(DateTime.Now.Millisecond);
+        #region Internal Methods
 
-            for(int i = 0; i < 8; i++)
-            {
-                code += r.Next(1, 8).ToString();
-            }
-
-            return code;
-        }
-
+        /// <summary>
+        /// Verifies if an user can make a guess.
+        /// </summary>
+        /// <param name="name">Username of the user</param>
+        /// <returns>True if he can make a guess</returns>
         internal bool CanGuess(string name)
         {
             if (CurrentUsersGuessed.Contains(name))
@@ -56,6 +54,12 @@ namespace AxiomMind.Models
                 return true;
         }
 
+        /// <summary>
+        /// Computes a guess for a user.
+        /// </summary>
+        /// <param name="guess">User's guess in format 12345678, where each number represents a color</param>
+        /// <param name="name">User's nickname</param>
+        /// <returns></returns>
         internal bool MakeGuess(string guess, string name)
         {
             CurrentUsersGuessed.Add(name);
@@ -82,12 +86,45 @@ namespace AxiomMind.Models
             }
         }
 
+        /// <summary>
+        /// Remove a user from the game
+        /// </summary>
+        /// <param name="name">User's nickname</param>
+        internal void Removeuser(string name)
+        {
+            Users.Remove(name);
+            Guesses.Remove(name);
+        }
+
+        /// <summary>
+        /// Verify if the game contains on or more users.
+        /// </summary>
+        /// <returns>True if there are at least one user playing.</returns>
+        internal bool HasUsers()
+        {
+            return Users.Count > 0;
+        }
+
+        /// <summary>
+        /// Verifies if there are no more remaining users to make their guess in the current round.
+        /// If no, the next round can begin.
+        /// </summary>
+        /// <returns>True if the next round can begin. False if there are still players that needs to play.</returns>
+        internal bool HasHoRemainingUsers()
+        {
+            return Guesses.Count() == Users.Count();
+        }
+
+        /// <summary>
+        /// Ends a round and compute players guesses, informing the results.
+        /// </summary>
+        /// <returns>A collection of each user guess result.</returns>
         internal IEnumerable<GuessResult> RoundOver()
         {
             var results = new List<GuessResult>();
             Round++;
 
-            lock(Guesses)
+            lock (Guesses)
             {
                 foreach (var guess in Guesses)
                 {
@@ -101,6 +138,16 @@ namespace AxiomMind.Models
             return results;
         }
 
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// Compute the scores of a guess
+        /// </summary>
+        /// <param name="guess">User's guess in format 12345678</param>
+        /// <param name="user">User's name</param>
+        /// <returns>A <c>GuessResult</c> object containnig the results for the user guess.</returns>
         private GuessResult AnalyzeGuess(string guess, string user)
         {
             var result = new GuessResult();
@@ -133,21 +180,24 @@ namespace AxiomMind.Models
 
             return result;
         }
-
-        internal void Removeuser(string name)
+        
+        /// <summary>
+        /// Generates a new random code for the game.
+        /// </summary>
+        /// <returns></returns>
+        private string GetNewCode()
         {
-            Users.Remove(name);
-            Guesses.Remove(name);
+            var code = "";
+            Random r = new Random(DateTime.Now.Millisecond);
+
+            for (int i = 0; i < 8; i++)
+            {
+                code += r.Next(1, 8).ToString();
+            }
+
+            return code;
         }
 
-        internal bool HasUsers()
-        {
-            return Users.Count > 0;
-        }
-
-        internal bool HasHoRemainingUsers()
-        {
-            return Guesses.Count() == Users.Count();
-        }
+        #endregion
     }
 }

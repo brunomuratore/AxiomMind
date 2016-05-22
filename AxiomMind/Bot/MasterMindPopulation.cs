@@ -42,6 +42,9 @@ namespace AxiomMind.Bot
 			}
 		}
 
+        /// <summary>
+        /// Calculates the next best generation
+        /// </summary>
 		public void NextGeneration()
 		{
 			// increment the generation;

@@ -14,6 +14,12 @@ namespace AxiomMind.Bot
         public static int CurrentRow = 0;
         public static int[,] Pegs = new int[8, 100];
 
+        /// <summary>
+        /// Calculate the best next hint for the previous guesses that were computed by SetResult method.
+        /// </summary>
+        /// <param name="nPopulation">Number of population of gens</param>
+        /// <param name="nGeneration">Number of generations</param>
+        /// <returns></returns>
         public int[] CalculateGeneration(int nPopulation, int nGeneration)
         {
             if (CurrentRow < 100)
@@ -33,6 +39,11 @@ namespace AxiomMind.Bot
             }
         }
 
+        /// <summary>
+        /// Set the results of a player guess. Must be called on each round that the user plays.
+        /// </summary>
+        /// <param name="rowIndex">The current round the game is (Zero based index)</param>
+        /// <param name="result">The result of the user's guess</param>
         internal void SetResult(int rowIndex, GuessResult result)
         {
             if (rowIndex == 0)
