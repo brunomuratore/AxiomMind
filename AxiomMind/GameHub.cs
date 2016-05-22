@@ -155,7 +155,7 @@ namespace AxiomMind
                 return false;
             }
 
-            if(_rooms[roomName].Users.Contains(BotName) && _rooms[roomName].Users.Count > 2)
+            if (_rooms[roomName].Users.Contains(BotName) && _rooms[roomName].Users.Count > 2)
             {
                 SendError("You can only start a match with the Bot if you are alone in the room.");
                 return false;
@@ -169,7 +169,7 @@ namespace AxiomMind
                 return false;
             }
 
-            lock(_users)
+            lock (_users)
             {
                 foreach (var user in _rooms[roomName].Users)
                 {
@@ -192,7 +192,7 @@ namespace AxiomMind
             string room = Clients.Caller.room;
             string name = Clients.Caller.name;
 
-            Guess(name, room, guess);
+            return Guess(name, room, guess);
         }
 
         #endregion
@@ -289,7 +289,7 @@ namespace AxiomMind
                     _userRooms[newUserName] = _userRooms[name];
 
                     var r = _userRooms[name];
-                    if(!String.IsNullOrEmpty(r))
+                    if (!String.IsNullOrEmpty(r))
                     {
                         _rooms[r].Users.Remove(name);
                         _rooms[r].Users.Add(newUserName);
@@ -431,7 +431,21 @@ namespace AxiomMind
 
         private void GiveHint(string name, string room)
         {
-            throw new NotImplementedException();
+            if (!_rooms[room].Users.Contains(BotName))
+            {
+                SendError("You can only request a Hint if you are playing alone with the AxiomBot.");
+                return;
+            }
+
+            AxiomBot bot = new AxiomBot();
+            var hint = bot.CalculateGeneration(1000, 10);
+            string sHint = "";
+            foreach (var i in hint)
+            {
+                sHint += i.ToString();
+            }
+
+            Clients.Group(room).addMessage(0, "AxiomBot", $"Try guessing this combination: {sHint}");
         }
 
         private void StartRound(int roundNumber, string roomName)
@@ -443,6 +457,12 @@ namespace AxiomMind
 
         private bool Guess(string name, string room, string guess)
         {
+            if (!EnsureUser())
+            {
+                SendError("You must set a name");
+                return false;
+            }
+
             if (guess.Length != 8)
             {
                 SendError("Your guess must have 8 characters");
@@ -539,7 +559,7 @@ namespace AxiomMind
         private void EndRound(Game game, string room)
         {
             List<string> winners = new List<string>();
-            lock(_users)
+            lock (_users)
             {
                 foreach (var result in game.RoundOver())
                 {
@@ -548,7 +568,7 @@ namespace AxiomMind
                     if (result.Exactly == 8)
                         winners.Add(result.UserName);
                     Clients.Client(recipientId).guessResult(result.Guess, result.Near, result.Exactly);
-                    if(game.HasBot)
+                    if (game.HasBot)
                     {
                         SendGuessToBot(game.Round, result);
                     }

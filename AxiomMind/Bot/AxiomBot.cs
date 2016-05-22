@@ -16,14 +16,21 @@ namespace AxiomMind.Bot
 
         public int[] CalculateGeneration(int nPopulation, int nGeneration)
         {
-            MasterMindPopulation TestPopulation = new MasterMindPopulation(nPopulation);
-            for (int i = 0; i < nGeneration; i++)
+            if(CurrentRow < 100)
             {
-                TestPopulation.NextGeneration();
-            }
+                MasterMindPopulation TestPopulation = new MasterMindPopulation(nPopulation);
+                for (int i = 0; i < nGeneration; i++)
+                {
+                    TestPopulation.NextGeneration();
+                }
 
-            int[] bestGenome = ((MastermindGenome)TestPopulation.GetHighestScoreGenome()).ToArray();
-            return bestGenome;
+                int[] bestGenome = ((MastermindGenome)TestPopulation.GetHighestScoreGenome()).ToArray();
+                return bestGenome;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         internal void SetResult(int rowIndex, GuessResult result)
@@ -48,7 +55,7 @@ namespace AxiomMind.Bot
 
             for (int i = 0; i < 8; i++)
             {
-                int gridValue = Convert.ToInt32(result.Guess[i]);
+                int gridValue = Convert.ToInt32(result.Guess[i].ToString());
                 Grid[i, rowIndex] = gridValue;
                 Pegs[i, rowIndex] = pegs[i];                
             }
