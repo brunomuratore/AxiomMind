@@ -252,8 +252,11 @@ $(function () {
     };
 
     game.client.endGame = function (winners) {
-        //TODO: End game - Show winners
-        //winners = array of strings
+        $("#msgEndGame").append("<p>WINEER: </p>");
+        for (var i = 0; i < winners.length; i++) {
+            $("#msgEndGame").append("<p>" + winners[i] + "</p>");
+        }
+        $("#msgEndGame").dialog("open");
     };
 
     // start FrontEnd script
@@ -286,7 +289,6 @@ $(function () {
     }
 
     // modal start
-
     var dialogOptions = {
            appendTo: "#game",
         dialogClass: "no-close",
@@ -299,6 +301,7 @@ $(function () {
     
     $("#msgNickname").dialog(dialogOptions);
     $("#msgStartGame").dialog(dialogOptions);
+    $("#msgEndGame").dialog(dialogOptions);
     
     $("#msgNickname").dialog({
         buttons: {
