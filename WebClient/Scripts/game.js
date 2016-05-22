@@ -152,6 +152,10 @@ $(function () {
         return false;
     });
 
+    game.client.hint = function (hint) {
+        $('#new-message').val('/guess ' + hint);
+    };
+
     $(window).blur(function () {
         game.state.focus = false;
     });

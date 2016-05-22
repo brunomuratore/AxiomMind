@@ -446,6 +446,7 @@ namespace AxiomMind
             }
 
             Clients.Group(room).addMessage(0, "AxiomBot", $"Try guessing this combination: {sHint}");
+            Clients.Group(room).hint(sHint);
         }
 
         private void StartRound(int roundNumber, string roomName)
