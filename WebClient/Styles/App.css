@@ -108,7 +108,7 @@ span.room{
     color:#bbb;
 }
 
-.message
+.messageError
 {
-    
+    color:red;
 }

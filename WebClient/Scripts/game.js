@@ -87,7 +87,7 @@ $(function () {
             id: id
         };
 
-        var e = $('#new-message-template').tmpl(data)
+        var e = $('#new-error-template').tmpl(data)
                                           .appendTo($('#messages'));
         refreshMessages();
         updateUnread();
