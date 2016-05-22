@@ -90,6 +90,7 @@
 span.room{
     width: 80%;
     float:left;
+    cursor: pointer;
 }
 
 .error 

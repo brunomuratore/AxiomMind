@@ -57,6 +57,13 @@ $(function () {
         $.each(rooms, function () {
             game.client.addRoom(this, true);
         });
+
+        $(".room").click(function () {
+            game.server.send('/join ' + $(this)[0].id)
+                .fail(function (e) {
+                    addMessage(e, 'error');
+                });
+        });
     };
 
     game.client.addMessage = function (id, name, message) {
@@ -83,8 +90,8 @@ $(function () {
             name: user.Name
         };
 
-        var e = $('#new-user-template').tmpl(data)
-                                       .appendTo($('#users'));
+        var e = $('#new-user-template').tmpl(data).appendTo($('#users'));
+                                       
         refreshUsers();
 
         if (!exists && this.state.name != user.Name) {
@@ -96,7 +103,7 @@ $(function () {
     };
 
     game.client.addRoom = function (room, exists) {
-        var id = 'u-' + room.Name;
+        var id = room.Name;
 
         var data = {
             name: room.Name,
@@ -197,9 +204,9 @@ $(function () {
                 .done(function () {
                     $("#msgNickname").dialog("close");
                     $("#msgStartGame").append("<p>Welcome " + nickname + "!</p>");
-                    $("#msgStartGame").append("<p>You can start a new game pressing the start game button.<br/>When you start a game, the game will start for all players in the room.</p>");
-                    $("#msgStartGame").append("<p>You can join a different room by clicking on it on the right panel.</p>");
-                    $("#msgStartGame").append("<p>Also, if you like, you can use the chat commands: '/join room', '/nick nick' and '/leavegame'.</p>");
+                    $("#msgStartGame").append("<p>You can play a game with all players in the room by clicking 'Start Game'.</p>");
+                    $("#msgStartGame").append("<p>You can join a different room by clicking on it.</p>");
+                    $("#msgStartGame").append("<p>Also, if you like, you can use the chat commands: '/join room', '/nick nick', '/start' and '/leavegame'.</p>");
 
                     $("#msgStartGame").dialog("open");
                 })
@@ -228,15 +235,10 @@ $(function () {
     });
 
     $("#btnStartGame").click(function () {
-        game.server.start()
-            .done(function (success) {
-                if (success === true) {
-                    gameCreated();
-                }
-            });
+        game.server.start();
     });
 
-    function gameCreated() {
+    game.client.gameCreated = function() {
         $("#gameContainer").removeClass();
     }
 
@@ -273,7 +275,8 @@ $(function () {
     };
 
     game.client.endGame = function (winners) {
-        $("#msgEndGame").append("<p>WINNEER: </p>");
+        $("#msgEndGame").html('');
+        $("#msgEndGame").append("<p>WINNER: </p>");        
         for (var i = 0; i < winners.length; i++) {
             $("#msgEndGame").append("<p>" + winners[i] + "</p>");
         }
@@ -348,9 +351,16 @@ $(function () {
             }
         }
     });
-    // modal end
 
-    
+    $("#msgEndGame").dialog({
+        buttons: {
+            "Ok": function () {
+                $("#msgEndGame").dialog("close");
+                $("#gameContainer").addClass('hidden');
+            }
+        }
+    });
+    // modal end
 
     // interface events start
     var gameselector = new GameSelector();

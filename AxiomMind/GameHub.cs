@@ -134,59 +134,12 @@ namespace AxiomMind
         #region Public Game
         public bool Start()
         {
-            if (!EnsureUserAndRoom())
-            {
-                SendError("You need to have a nickName to start a game.");
-                return false;
-            }
-
             string roomName = Clients.Caller.room;
             string name = Clients.Caller.name;
 
-            if (_rooms[roomName].HasGame)
-            {
-                SendError("You can't start a game here. This room already has a game in progress.");
-                return false;
-            }
-
-            if (!String.IsNullOrEmpty(_users[name].CurrentGame))
-            {
-                SendError("Game could not be started. You are already in a game.");
-                return false;
-            }
-
-            if (_rooms[roomName].Users.Contains(BotName) && _rooms[roomName].Users.Count > 2)
-            {
-                SendError("You can only start a match with the Bot if you are alone in the room.");
-                return false;
-            }
-
-            Game game = new Game(_rooms[roomName].Users);
-
-            if (!_games.TryAdd(game.Guid, game))
-            {
-                SendError("Game could not be started. Please try again.");
-                return false;
-            }
-
-            lock (_users)
-            {
-                foreach (var user in _rooms[roomName].Users)
-                {
-                    if (user == BotName)
-                        game.HasBot = true;
-                    else
-                        _users[user].CurrentGame = game.Guid;
-                }
-            }
-
-            _rooms[roomName].HasGame = true;
-            Clients.Group(roomName).addMessage(0, "AxiomMind", $"User {name} has started a game for {_rooms[roomName].Users.Count()} users.");
-            StartRound(game.Round, roomName);
-
-            return true;
+            return StartGame(name, roomName);
         }
-
+        
         public bool SendGuess(string guess)
         {
             string room = Clients.Caller.room;
@@ -260,6 +213,12 @@ namespace AxiomMind
                     else if (commandName.Equals("hint", StringComparison.OrdinalIgnoreCase))
                     {
                         GiveHint(name, room);
+                        return true;
+                    }
+
+                    else if (commandName.Equals("start", StringComparison.OrdinalIgnoreCase))
+                    {
+                        StartGame(name, room);
                         return true;
                     }
                 }
@@ -426,6 +385,59 @@ namespace AxiomMind
         #endregion
 
         #region Private Game
+
+        private bool StartGame(string name, string roomName)
+        {
+            if (!EnsureUserAndRoom())
+            {
+                SendError("You need to have a nickName to start a game.");
+                return false;
+            }
+
+            if (_rooms[roomName].HasGame)
+            {
+                SendError("You can't start a game here. This room already has a game in progress.");
+                return false;
+            }
+
+            if (!String.IsNullOrEmpty(_users[name].CurrentGame))
+            {
+                SendError("Game could not be started. You are already in a game.");
+                return false;
+            }
+
+            if (_rooms[roomName].Users.Contains(BotName) && _rooms[roomName].Users.Count > 2)
+            {
+                SendError("You can only start a match with the Bot if you are alone in the room.");
+                return false;
+            }
+
+            Game game = new Game(_rooms[roomName].Users);
+
+            if (!_games.TryAdd(game.Guid, game))
+            {
+                SendError("Game could not be started. Please try again.");
+                return false;
+            }
+
+            lock (_users)
+            {
+                foreach (var user in _rooms[roomName].Users)
+                {
+                    if (user == BotName)
+                        game.HasBot = true;
+                    else
+                        _users[user].CurrentGame = game.Guid;
+                }
+            }
+
+            _rooms[roomName].HasGame = true;
+            Clients.Group(roomName).addMessage(0, "AxiomMind", $"User {name} has started a game for {_rooms[roomName].Users.Count()} users.");
+            Clients.Group(roomName).gameCreated();
+            StartRound(game.Round, roomName);
+
+            return true;
+        }
 
         private void GiveHint(string name, string room)
         {
