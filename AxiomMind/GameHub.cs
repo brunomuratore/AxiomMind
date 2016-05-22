@@ -273,9 +273,12 @@ namespace AxiomMind
                     _userRooms[newUserName] = _userRooms[name];
 
                     var r = _userRooms[name];
-                    _rooms[r].Users.Remove(name);
-                    _rooms[r].Users.Add(newUserName);
-                    Clients.Group(r).changeUserName(oldUser, newUser);
+                    if(!String.IsNullOrEmpty(r))
+                    {
+                        _rooms[r].Users.Remove(name);
+                        _rooms[r].Users.Add(newUserName);
+                        Clients.Group(r).changeUserName(oldUser, newUser);
+                    }
 
                     string ignoredRoom;
                     ChatUser ignoredUser;
