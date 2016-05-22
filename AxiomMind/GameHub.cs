@@ -14,14 +14,24 @@ namespace AxiomMind
 {
     public class GameHub : Hub
     {
+        // Holds info of each connected user
         public static readonly ConcurrentDictionary<string, ChatUser> _users = new ConcurrentDictionary<string, ChatUser>(StringComparer.OrdinalIgnoreCase);
+        // Holds info of which room is a user connected
         public static readonly ConcurrentDictionary<string, string> _userRooms = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        // Holds info of each created room 
         public static readonly ConcurrentDictionary<string, ChatRoom> _rooms = new ConcurrentDictionary<string, ChatRoom>(StringComparer.OrdinalIgnoreCase);
+        // Holds info of each game in progress
         public static readonly ConcurrentDictionary<string, Game> _games = new ConcurrentDictionary<string, Game>();
 
+        // Our pretty Bot Name
         public const string BotName = "AxiomBot";
 
         #region Public Chat
+        /// <summary>
+        /// Occurs when a client wants to connect to the server.
+        /// Generate user cookies and wait for next request.
+        /// </summary>
+        /// <returns>True if the user could connect. False Otherwise.</returns>
         public bool Join()
         {
             // Check the user id cookie
@@ -62,6 +72,20 @@ namespace AxiomMind
             return false;
         }
 
+        /// <summary>
+        /// Occurs when a client sends some command via the console to the server.
+        /// We handle this command and execute the proper action.
+        /// Available commands:
+        /// /nick nickName
+        /// /join roomName
+        /// /leaveGame
+        /// /start
+        /// /guess 12345678
+        /// /hint
+        /// If no command is found, sends a message to all users on the room.
+        /// Html tags are not supported and will be encoded.
+        /// </summary>
+        /// <param name="content">The string representing the command</param>
         public void Send(string content)
         {
             content = content.Replace("<", "&lt;").Replace(">", "&gt;");
@@ -83,6 +107,12 @@ namespace AxiomMind
             }
         }
 
+        /// <summary>
+        /// Occurs when a user is disconnected from the server.
+        /// We clean this user data and remove him from the game/room he was.
+        /// </summary>
+        /// <param name="stopCalled">SignalR parameter, don't change</param>
+        /// <returns></returns>
         public override Task OnDisconnected(bool stopCalled)
         {
             ChatUser user = _users.Values.FirstOrDefault(u => u.ConnectionId == Context.ConnectionId);
@@ -106,6 +136,12 @@ namespace AxiomMind
             return null;
         }
 
+        /// <summary>
+        /// Occurs when any user joins or leave a room.
+        /// Updates the room information for all clients that were on that room.
+        /// Get a list of users that are in the same room as the requester.
+        /// </summary>
+        /// <returns>A list of <c>ChatUser</c> representing each user.</returns>
         public IEnumerable<ChatUser> GetUsers()
         {
             string room = Clients.Caller.room;
@@ -119,6 +155,9 @@ namespace AxiomMind
                    select _users[name];
         }
 
+        /// <summary>
+        /// Occurs when some user joined / left a room. Updates room information for all connected users.
+        /// </summary>
         public void UpdateRooms()
         {
             var rooms = _rooms.Select(r => new
@@ -132,6 +171,12 @@ namespace AxiomMind
         #endregion
 
         #region Public Game
+
+        /// <summary>
+        /// Occurs when a user wants to start a new game.
+        /// Starts a new game for all users in caller's room and inform all of them.
+        /// </summary>
+        /// <returns>True if the game could be started.</returns>
         public bool Start()
         {
             string roomName = Clients.Caller.room;
@@ -140,6 +185,12 @@ namespace AxiomMind
             return StartGame(name, roomName);
         }
         
+        /// <summary>
+        /// Occurs when a player make a guess in a game.
+        /// Add this guess to the game, and if all players made the guess, go to next game Round, informing all players in the game.
+        /// </summary>
+        /// <param name="guess">String containing player guess in format 12345678, where each number represents a color.</param>
+        /// <returns></returns>
         public bool SendGuess(string guess)
         {
             string room = Clients.Caller.room;
@@ -152,6 +203,11 @@ namespace AxiomMind
 
         #region Private Chat
 
+        /// <summary>
+        /// Handle commands sent by user.
+        /// </summary>
+        /// <param name="message">The command</param>
+        /// <returns>True if it was a valid command.</returns>
         private bool TryHandleCommand(string message)
         {
             string room = Clients.Caller.room;
@@ -226,6 +282,13 @@ namespace AxiomMind
             return false;
         }
 
+        /// <summary>
+        /// Changes user nickname.
+        /// </summary>
+        /// <param name="name">Current nickname</param>
+        /// <param name="room">Room where the user is</param>
+        /// <param name="newUserName">New nickname</param>
+        /// <returns></returns>
         private bool ChangeNickName(string name, string room, string newUserName)
         {
             if (!_users.ContainsKey(newUserName))
@@ -280,6 +343,13 @@ namespace AxiomMind
             return true;
         }
 
+        /// <summary>
+        /// Creates a new room and join the user on it. If the room already exists, just join it.
+        /// </summary>
+        /// <param name="name">Username of user that will join the room</param>
+        /// <param name="room">Current room</param>
+        /// <param name="newRoom">New room</param>
+        /// <returns></returns>
         private bool JoinRoom(string name, string room, string newRoom)
         {
             ChatRoom chatRoom;
@@ -329,6 +399,11 @@ namespace AxiomMind
             return true;
         }
 
+        /// <summary>
+        /// Creates a new user when he joins the server.
+        /// </summary>
+        /// <param name="newUserName">Users nickname that will be created</param>
+        /// <returns>A <c>ChatUser</c> object representing the new user.</returns>
         private ChatUser AddUser(string newUserName)
         {
             var user = new ChatUser(newUserName);
@@ -344,6 +419,10 @@ namespace AxiomMind
             return user;
         }
 
+        /// <summary>
+        /// Verifies if the caller is connected as user with a valid nickname, and is in a room.
+        /// </summary>
+        /// <returns>True or False</returns>
         private bool EnsureUserAndRoom()
         {
             if (!EnsureUser())
@@ -367,11 +446,19 @@ namespace AxiomMind
             return true;
         }
 
+        /// <summary>
+        /// Sends an error message to the client, that will be shown on Console.
+        /// </summary>
+        /// <param name="errorMessage">The error message.</param>
         private void SendError(string errorMessage)
         {
             Clients.Caller.addError(0, "AxiomMind", errorMessage);
         }
 
+        /// <summary>
+        /// Verifies if the caller is connected as user with a valid nickname.
+        /// </summary>
+        /// <returns>True or False</returns>
         private bool EnsureUser()
         {
             string name = Clients.Caller.name;
@@ -386,6 +473,12 @@ namespace AxiomMind
 
         #region Private Game
 
+        /// <summary>
+        /// Starts a new game for all players in the same room as the caller.
+        /// </summary>
+        /// <param name="name">Username of the caller.</param>
+        /// <param name="roomName">Current room of the caller.</param>
+        /// <returns>True if the game was started.</returns>
         private bool StartGame(string name, string roomName)
         {
             if (!EnsureUserAndRoom())
@@ -439,6 +532,12 @@ namespace AxiomMind
             return true;
         }
 
+        /// <summary>
+        /// If the user is in a game with the Bot, gives the user a hint of what would be the next best guess.
+        /// If user continues asking for hints, the Bot should solve the problem sometime.
+        /// </summary>
+        /// <param name="name">Nickname of the caller user</param>
+        /// <param name="room">Current room of the caller user</param>
         private void GiveHint(string name, string room)
         {
             if (!_rooms[room].Users.Contains(BotName))
@@ -459,6 +558,11 @@ namespace AxiomMind
             Clients.Group(room).hint(sHint);
         }
 
+        /// <summary>
+        /// When all players made their guesses, start a new round of the game.
+        /// </summary>
+        /// <param name="roundNumber">Number of the new round.</param>
+        /// <param name="roomName">Room where the game is being held.</param>
         private void StartRound(int roundNumber, string roomName)
         {
             Clients.Group(roomName).addMessage(0, "AxiomMind", $"");
@@ -466,6 +570,13 @@ namespace AxiomMind
             Clients.Group(roomName).addMessage(0, "AxiomMind", $"Make your guess typing \"/guess 12345678\"");
         }
 
+        /// <summary>
+        /// Computes the guess of a player.
+        /// </summary>
+        /// <param name="name">Caller player nickname.</param>
+        /// <param name="room">Caller player room.</param>
+        /// <param name="guess">Guess in format 12345678 where each number is a color.</param>
+        /// <returns>True if the guess was computed</returns>
         private bool Guess(string name, string room, string guess)
         {
             if (!EnsureUser())
@@ -523,6 +634,13 @@ namespace AxiomMind
             return true;
         }
 
+        /// <summary>
+        /// Occurs when any player wins the game, or there are no more players left on the game.
+        /// Inform all players of the winner.
+        /// </summary>
+        /// <param name="winners">List containing usernames of all the winners (If more than one guessed the code in the same round)</param>
+        /// <param name="room">Room where the game was being held</param>
+        /// <param name="game"><c>Game</c> object that represents the current game.</param>
         private void EndGame(List<string> winners, string room, Game game)
         {
             _games.TryRemove(game.Guid, out game);
@@ -542,6 +660,12 @@ namespace AxiomMind
                 Clients.Group(room).addMessage(0, "AxiomMind", $"Our winner{(winners.Count > 1 ? "s" : "")} {(winners.Count > 1 ? "are" : "is")}: {string.Join<string>(" and ", winners)}");
         }
 
+        /// <summary>
+        /// Occurs when a user wants to leave the game, or was disconnect from the server.
+        /// Remove the player from the game, and make the game continue for all other users.
+        /// </summary>
+        /// <param name="name">Nickname of player that will be removed from the game.</param>
+        /// <param name="room">Room where this player is.</param>
         private void LeaveGame(string name, string room)
         {
             var gameId = _users[name].CurrentGame;
@@ -565,8 +689,13 @@ namespace AxiomMind
 
             Clients.Group(room).addMessage(0, "AxiomMind", $"{name} has left the game.");
         }
-
-
+        
+        /// <summary>
+        /// Occurs when all players made a guess for the current round.
+        /// Verify if there was a winner and ends the game, otherwise creates a new round.
+        /// </summary>
+        /// <param name="game"><c>Game</c> object representing the current game.</param>
+        /// <param name="room">Room where the game is being held.</param>
         private void EndRound(Game game, string room)
         {
             List<string> winners = new List<string>();
@@ -591,6 +720,12 @@ namespace AxiomMind
                 EndGame(winners, room, game);
         }
 
+        /// <summary>
+        /// Occurs when a player that is playing in the bot makes a guess.
+        /// Inform the bot of what was the player's guess, and the guess results (exact and near matches).
+        /// </summary>
+        /// <param name="round">Number of current round of the game.</param>
+        /// <param name="result">a <c>GuessResult</c> object representing the result of a players guess.</param>
         private void SendGuessToBot(int round, GuessResult result)
         {
             AxiomBot bot = new AxiomBot();
