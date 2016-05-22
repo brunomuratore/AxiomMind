@@ -438,7 +438,7 @@ namespace AxiomMind
             }
 
             AxiomBot bot = new AxiomBot();
-            var hint = bot.CalculateGeneration(1000, 10);
+            var hint = bot.CalculateGeneration(2000, 20);
             string sHint = "";
             foreach (var i in hint)
             {
