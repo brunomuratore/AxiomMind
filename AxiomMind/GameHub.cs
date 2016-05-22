@@ -316,9 +316,7 @@ namespace AxiomMind
             {
                 JoinRoom(newUserName, "", "General");
                 Clients.Caller.addMessage(0, "AxiomMind", "You are in general room.");
-                Clients.Caller.addMessage(0, "AxiomMind", "Now you can create/join a game room typing \"/join roomname\".");
-                Clients.Caller.addMessage(0, "AxiomMind", "You can see already created rooms on the right menu.");
-                Clients.Caller.addMessage(0, "AxiomMind", "To start a game, please click start game.");
+                Clients.Caller.addMessage(0, "AxiomMind", "Now you can create or join a room typing \"/join roomname\".");                
             }
             return true;
         }

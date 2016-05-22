@@ -17,6 +17,7 @@
 .colors {
   background-color: white;
   margin-bottom: 5px;
+  cursor: move;
 }
 .line div, .colors div, .history .line div {
   display: inline-block;
@@ -82,4 +83,7 @@
 }
 .no-close .ui-dialog-titlebar-close {
   display: none;
+}
+button{
+    cursor: pointer;
 }

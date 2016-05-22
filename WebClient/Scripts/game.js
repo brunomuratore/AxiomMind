@@ -290,28 +290,33 @@ $(function () {
 
     // modal start
     var dialogOptions = {
-           appendTo: "#game",
+        appendTo: "#game",
         dialogClass: "no-close",
-          draggable: false,
-           autoOpen: false,
-          resizable: false,
-      closeOnEscape: false,
-           position: { my: "top", at: "top", of: "#game" }
+        draggable: true,
+        autoOpen: false,
+        resizable: false,
+        closeOnEscape: false,
+        position: { my: "top", at: "top", of: "#game" }
     }
-    
+
     $("#msgNickname").dialog(dialogOptions);
     $("#msgStartGame").dialog(dialogOptions);
     $("#msgEndGame").dialog(dialogOptions);
-    
+
     $("#msgNickname").dialog({
-        buttons: {
-            "Confirm": function () {
+        open: function () {
+            $(this).off('submit').on('submit', function () {
+
                 var nickname = $("#msgNickname #name").val();
                 if (nickname != null) {
                     game.server.send("/nick " + nickname)
                         .done(function () {
                             $("#msgNickname").dialog("close");
-                            $("#msgStartGame").append("<p>Welcome " + nickname + " let's start a game!</p>");
+                            $("#msgStartGame").append("<p>Welcome " + nickname + "!.</p>");
+                            $("#msgStartGame").append("<p>You can start a new game pressing the start game button.<br/>When you start a game, the game will start for all players in the room.</p>");
+                            $("#msgStartGame").append("<p>You can join a different room by clicking on it on the right panel.</p>");
+                            $("#msgStartGame").append("<p>Also, if you like, you can use the chat commands: '/join room', '/nick nick' and '/leavegame'.</p>");
+
                             $("#msgStartGame").dialog("open");
                         })
                         .fail(function (e) {
@@ -319,24 +324,21 @@ $(function () {
                             addMessage(e, 'error');
                         });
                 }
-            }
+                $(this).dialog('close');
+                return false;
+            });
+        },
+        buttons: {
+            "Confirm": function () { }
         }
     });
 
     $("#msgNickname").dialog("open");
-    
+
     $("#msgStartGame").dialog({
         buttons: {
-            "Start Game": function () {
-                game.server.start()
-                    .done(function () {
-                        $("#msgStartGame").dialog("close");
-                        gameCreated();
-                    })
-                    .fail(function (e) {
-                        alert(e);
-                        addMessage(e, 'error');
-                    });
+            "Ok": function () {
+                $("#msgStartGame").dialog("close");
             }
         }
     });
@@ -364,8 +366,8 @@ $(function () {
         $sequence = $("#gameContainer .line.active");
 
     $("div", $colorPick).draggable({
-        cancel: "a.ui-icon", 
-        revert: "invalid", 
+        cancel: "a.ui-icon",
+        revert: "invalid",
         containment: "document",
         helper: "clone",
         cursor: "move"
@@ -373,11 +375,11 @@ $(function () {
     $("div", $sequence).droppable({
         accept: "#gameContainer .colors div",
         activeClass: "none",
-        drop: function( event, ui ) {
+        drop: function (event, ui) {
             setColor(ui.draggable, $(this));
         }
     });
-    function setColor( $color, $position ) {
+    function setColor($color, $position) {
         var color = $color.attr("class").split(" ")[0];
         gameselector.setColor(color);
 
