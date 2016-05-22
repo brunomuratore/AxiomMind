@@ -401,6 +401,7 @@ $(function () {
         //if submited ok
         game.server.sendGuess(gameselector.sequence.join(""))
             .done(function () {
+                $('#new-message').val('');
                 //wait message
             })
             .fail(function (e) {
