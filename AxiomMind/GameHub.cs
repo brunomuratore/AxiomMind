@@ -187,7 +187,7 @@ namespace AxiomMind
             return true;
         }
 
-        public void SendGuess(string guess)
+        public bool SendGuess(string guess)
         {
             string room = Clients.Caller.room;
             string name = Clients.Caller.name;
