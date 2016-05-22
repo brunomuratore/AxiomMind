@@ -252,7 +252,7 @@ $(function () {
     };
 
     game.client.endGame = function (winners) {
-        $("#msgEndGame").append("<p>WINEER: </p>");
+        $("#msgEndGame").append("<p>WINNEER: </p>");
         for (var i = 0; i < winners.length; i++) {
             $("#msgEndGame").append("<p>" + winners[i] + "</p>");
         }
