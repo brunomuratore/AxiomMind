@@ -19,6 +19,7 @@ $(function () {
 
     game.client.addUser = function (user, exists) {
         updateCookie();
+        game.server.send('Hello ' + user.Name + '. You can ask for hints by typing "/hint" on the chat. It will be a pleasure helping you');
     };
 
     game.client.addRoom = function (room, exists) {

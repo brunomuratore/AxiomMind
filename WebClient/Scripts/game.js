@@ -80,6 +80,20 @@ $(function () {
         e[0].scrollIntoView();
     };
 
+    game.client.addError = function (id, name, message) {
+        var data = {
+            name: name,
+            message: message,
+            id: id
+        };
+
+        var e = $('#new-error-template').tmpl(data)
+                                          .appendTo($('#messages'));
+        refreshMessages();
+        updateUnread();
+        e[0].scrollIntoView();
+    };
+
     game.client.addUser = function (user, exists) {
         var id = 'u-' + user.Name;
         if (document.getElementById(id)) {
