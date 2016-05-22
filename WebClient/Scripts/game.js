@@ -161,6 +161,7 @@ $(function () {
 
     game.client.hint = function (hint) {
         $('#new-message').val('/guess ' + hint);
+        gameselector.setCompleteSequence(hint);
     };
 
     $(window).blur(function () {
@@ -243,6 +244,8 @@ $(function () {
     }
 
     game.client.guessResult = function (guess, near, exact) {
+
+        gameselector.setCompleteSequence(guess);
         $(".history").prepend($(".hidden .line").clone());
 
         for (var i = 0; i < gameselector.sequence.length; i++) {
@@ -310,6 +313,20 @@ $(function () {
             this.option = 0;
             this.sequenceList = [];
         }
+        setCompleteSequence(sequence) {
+            var $colorsOptions = $(".colors").children();
+            var $colorsHint = $(".line.active").children();
+            for (var i = 0; i < 8 ; i++) {
+
+                var hintColor = sequence.split("")[i];
+                var color = $colorsOptions.eq(hintColor - 1).attr("class").split(" ")[0];
+                gameselector.setColor(color);
+
+                gameselector.setOption(i);
+                gameselector.setSequenceColor();
+                $colorsHint.eq(i).attr("class", gameselector.colorName);
+            }
+        }
     }
 
     // modal start
@@ -357,6 +374,7 @@ $(function () {
             "Ok": function () {
                 $("#msgEndGame").dialog("close");
                 $("#gameContainer").addClass('hidden');
+                $(".history").children().remove();
             }
         }
     });
