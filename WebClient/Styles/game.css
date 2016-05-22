@@ -1,6 +1,6 @@
 ﻿#gameContainer {
   width: 530px;
-  height: 700px;
+  height: inherit;
   padding: 5px;
   --background-color: lime;
 }
@@ -32,7 +32,7 @@
   vertical-align: top;
 }
 .history {
-  height: 400px;
+  height: auto;
 }
 .history .line .result {
   width: 70px;
@@ -78,5 +78,8 @@
   background-color: rgb(0, 0, 0);
 }
 .hidden {
+  display: none;
+}
+.no-close .ui-dialog-titlebar-close {
   display: none;
 }

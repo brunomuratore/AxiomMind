@@ -216,15 +216,10 @@ $(function () {
     });
 
     function gameCreated() {
-        //todo: Implement here
-        //display game UI for empty game
+        $("#gameContainer").removeClass();
     }
 
     game.client.guessResult = function (guess, near, exact) {
-        //TODO: Show results of guess
-        //guess = string
-        //near = int, number of near tags
-        //exact = int, number of exact tags
         $(".history").prepend($(".hidden .line").clone());
 
         for (var i = 0; i < gameselector.sequence.length; i++) {
@@ -289,6 +284,63 @@ $(function () {
             this.sequenceList = [];
         }
     }
+
+    // modal start
+
+    var dialogOptions = {
+           appendTo: "#game",
+        dialogClass: "no-close",
+          draggable: false,
+           autoOpen: false,
+          resizable: false,
+      closeOnEscape: false,
+           position: { my: "top", at: "top", of: "#game" }
+    }
+    
+    $("#msgNickname").dialog(dialogOptions);
+    $("#msgStartGame").dialog(dialogOptions);
+    
+    $("#msgNickname").dialog({
+        buttons: {
+            "Confirm": function () {
+                var nickname = $("#msgNickname #name").val();
+                if (nickname != null) {
+                    game.server.send("/nick " + nickname)
+                        .done(function () {
+                            $("#msgNickname").dialog("close");
+                            $("#msgStartGame").append("<p>Welcome " + nickname + " let's start a game!</p>");
+                            $("#msgStartGame").dialog("open");
+                        })
+                        .fail(function (e) {
+                            alert(e);
+                            addMessage(e, 'error');
+                        });
+                }
+            }
+        }
+    });
+
+    $("#msgNickname").dialog("open");
+    
+    $("#msgStartGame").dialog({
+        buttons: {
+            "Start Game": function () {
+                game.server.start()
+                    .done(function () {
+                        $("#msgStartGame").dialog("close");
+                        gameCreated();
+                    })
+                    .fail(function (e) {
+                        alert(e);
+                        addMessage(e, 'error');
+                    });
+            }
+        }
+    });
+    // modal end
+
+
+    // interface events start
     var gameselector = new GameSelector();
 
     $(".colors div").click(function () {
@@ -306,12 +358,14 @@ $(function () {
     $("#btn-check").click(function () {
         //if submited ok
         game.server.sendGuess(gameselector.sequence.join(""))
-            .done(function (success) {
-                if (success === false) {
-                    //error message
-                }
+            .done(function () {
+                //wait message
+            })
+            .fail(function (e) {
+                alert(e);
             });
     });
+    // interface events end
 
     // end FrontEnd script
 
