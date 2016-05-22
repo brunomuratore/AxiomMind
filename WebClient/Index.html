@@ -4,6 +4,8 @@
     <title>AxiomMind game</title>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <link href="Styles/App.css" rel="Stylesheet" />
+    <link href="Styles/game.css" rel="Stylesheet" >
+
     <script src="Scripts/jquery-1.6.4.min.js"></script>
     <script src="Scripts/json2.min.js" type="text/javascript"></script>
     <script src="Scripts/jquery.signalR-2.2.0.min.js" type="text/javascript"></script>
@@ -32,20 +34,54 @@
 <body>
     <div id="chat-area">
         <div id="game" class="leftPanel">
-            <div id="gameContent">
-                <table>
-                    <thead>
-                        <tr>
-                            <td>Round</td>
-                            <td>Guess</td>
-                            <td>Exact</td>
-                            <td>Near</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                    </tbody>
-                </table>
+            <div id="gameContainer">
+                <div class="colors">
+                    <div class="red"></div>
+                    <div class="orange"></div>
+                    <div class="yellow"></div>
+                    <div class="green"></div>
+                    <div class="lightblue"></div>
+                    <div class="blue"></div>
+                    <div class="purple"></div>
+                    <div class="pink"></div>
+                </div>
+                <div class="line active">
+                    <div class="white"></div>
+                    <div class="white"></div>
+                    <div class="white"></div>
+                    <div class="white"></div>
+                    <div class="white"></div>
+                    <div class="white"></div>
+                    <div class="white"></div>
+                    <div class="white"></div>
+                    <button id="btn-check">
+                        Verify
+                    </button>
+                </div>
+                <div class="history">
+                </div>
+            </div>
+            <div class="hidden">
+                <div class="line">
+                    <div class="white"></div>
+                    <div class="white"></div>
+                    <div class="white"></div>
+                    <div class="white"></div>
+                    <div class="white"></div>
+                    <div class="white"></div>
+                    <div class="white"></div>
+                    <div class="white"></div>
+                    <div class="result">
+                        <div class="white"></div>
+                        <div class="white"></div>
+                        <div class="white"></div>
+                        <div class="white"></div>
+                        <div class="white"></div>
+                        <div class="white"></div>
+                        <div class="white"></div>
+                        <div class="white"></div>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="rooms" class="rightPanel">

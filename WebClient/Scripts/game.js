@@ -56,7 +56,7 @@ $(function () {
     game.client.showRooms = function (rooms) {
         $.each(rooms, function () {
             game.client.addRoom(this, true);
-        });        
+        });
     };
 
     game.client.addMessage = function (id, name, message) {
@@ -97,7 +97,7 @@ $(function () {
 
     game.client.addRoom = function (room, exists) {
         var id = 'u-' + room.Name;
-        
+
         var data = {
             name: room.Name,
             count: room.Count
@@ -105,12 +105,12 @@ $(function () {
 
         var newEl = $('#new-room-template').tmpl(data);
         var el = document.getElementById(id);
-        if(el)
+        if (el)
             $('#' + id).replaceWith(newEl);
         else
             newEl.appendTo($('#roomsContainer'));
     };
-    
+
     game.client.changeUserName = function (oldUser, newUser) {
         $('#u-' + oldUser.Name).replaceWith(
                 $('#new-user-template').tmpl({
@@ -197,7 +197,7 @@ $(function () {
             .done(function (success) {
                 if (success === false) {
                     $.cookie('userid', '');
-                    addMessage('To start, choose a name typing "/nick nickname".', 'notification');                    
+                    addMessage('To start, choose a name typing "/nick nickname".', 'notification');
                 }
             });
     });
@@ -227,5 +227,65 @@ $(function () {
         //TODO: End game - Show winners
         //winners = array of strings
     };
-    
+
+    // start FrontEnd script
+    class GameSelector {
+        constructor() {
+            this.colors = ["white", "red", "yellow", "orange", "green", "lightblue", "blue", "purple", "pink"];
+            this.sequence = [0, 0, 0, 0, 0, 0, 0, 0];
+            this.colorName = "none";
+            this.colorIndex = 0;
+            this.option = 0;
+            this.sequenceList = [];
+        }
+        setOption(index) {
+            this.option = index;
+        }
+        setColor(color) {
+            this.colorName = color;
+            this.colorIndex = this.colors.indexOf(color);
+        }
+        setSequenceColor() {
+            this.sequence[this.option] = this.colorIndex;
+        }
+        reset() {
+            this.sequence = [0, 0, 0, 0, 0, 0, 0, 0];
+            this.colorName = "none";
+            this.colorIndex = 0;
+            this.option = 0;
+            this.sequenceList = [];
+        }
+    }
+    var gameselector = new GameSelector();
+
+    $(".colors div").click(function () {
+        var color = $(this).attr("class");
+        gameselector.setColor(color);
+    });
+
+    $(".line.active div").click(function () {
+        var index = $(".line.active div").index(this);
+        gameselector.setOption(index);
+        gameselector.setSequenceColor();
+        $(this).attr("class", gameselector.colorName);
+    });
+
+    $("#btn-check").click(function () {
+        //if submited ok
+        $(".history").prepend($(".hidden .line").clone());
+
+        for (var i = 0; i < gameselector.sequence.length; i++) {
+            $(".history .line")
+              .children().eq(i)
+              .attr(
+                "class",
+                gameselector.colors[gameselector.sequence[i]]
+              );
+        }
+        $(".line.active div").attr("class", "white");
+        gameselector.reset();
+    });
+
+    // end FrontEnd script
+
 });

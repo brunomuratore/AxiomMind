@@ -85,6 +85,7 @@
     <Content Include="Scripts\jquery.signalR-2.2.0.js" />
     <Content Include="Scripts\jquery.signalR-2.2.0.min.js" />
     <Content Include="Styles\App.css" />
+    <Content Include="Styles\game.css" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
