@@ -56,7 +56,6 @@
     float: left;
     margin-left: 0px;
     padding-left: 0px;
-    overflow: auto;
     font-size: small;
     white-space: nowrap;
     margin-bottom: 15px;
@@ -85,7 +84,7 @@
 }
 
 #btnStartGame{
-    width: 100%;
+    margin-left: 22px;
 }
 
 span.room{

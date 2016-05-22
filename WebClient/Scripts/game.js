@@ -189,6 +189,27 @@ $(function () {
         $.cookie('userid', game.state.id, { path: '/', expires: 30 });
     }
 
+    function changeNick()
+    {
+        var nickname = $("#msgNickname #name").val();
+        if (nickname != null) {
+            game.server.send("/nick " + nickname)
+                .done(function () {
+                    $("#msgNickname").dialog("close");
+                    $("#msgStartGame").append("<p>Welcome " + nickname + "!</p>");
+                    $("#msgStartGame").append("<p>You can start a new game pressing the start game button.<br/>When you start a game, the game will start for all players in the room.</p>");
+                    $("#msgStartGame").append("<p>You can join a different room by clicking on it on the right panel.</p>");
+                    $("#msgStartGame").append("<p>Also, if you like, you can use the chat commands: '/join room', '/nick nick' and '/leavegame'.</p>");
+
+                    $("#msgStartGame").dialog("open");
+                })
+                .fail(function (e) {
+                    alert(e);
+                    addMessage(e, 'error');
+                });
+        }
+    }
+
     addMessage('Welcome to AxiomMind.', 'notification');
 
     $('#new-message').val('');
@@ -306,30 +327,15 @@ $(function () {
     $("#msgNickname").dialog({
         open: function () {
             $(this).off('submit').on('submit', function () {
-
-                var nickname = $("#msgNickname #name").val();
-                if (nickname != null) {
-                    game.server.send("/nick " + nickname)
-                        .done(function () {
-                            $("#msgNickname").dialog("close");
-                            $("#msgStartGame").append("<p>Welcome " + nickname + "!.</p>");
-                            $("#msgStartGame").append("<p>You can start a new game pressing the start game button.<br/>When you start a game, the game will start for all players in the room.</p>");
-                            $("#msgStartGame").append("<p>You can join a different room by clicking on it on the right panel.</p>");
-                            $("#msgStartGame").append("<p>Also, if you like, you can use the chat commands: '/join room', '/nick nick' and '/leavegame'.</p>");
-
-                            $("#msgStartGame").dialog("open");
-                        })
-                        .fail(function (e) {
-                            alert(e);
-                            addMessage(e, 'error');
-                        });
-                }
+                changeNick();
                 $(this).dialog('close');
                 return false;
             });
         },
         buttons: {
-            "Confirm": function () { }
+            "Confirm": function () {
+                changeNick();
+            }
         }
     });
 
@@ -344,6 +350,7 @@ $(function () {
     });
     // modal end
 
+    
 
     // interface events start
     var gameselector = new GameSelector();
@@ -389,6 +396,11 @@ $(function () {
         $position.attr("class", gameselector.colorName);
     }
 
+    $("#btnStartGame").button({
+        icons: {
+            primary: "ui-icon-power"
+        }
+    });
 
     // drag&drop end
 
