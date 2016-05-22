@@ -343,18 +343,6 @@ $(function () {
     // interface events start
     var gameselector = new GameSelector();
 
-    $(".colors div").click(function () {
-        var color = $(this).attr("class");
-        gameselector.setColor(color);
-    });
-
-    $(".line.active div").click(function () {
-        var index = $(".line.active div").index(this);
-        gameselector.setOption(index);
-        gameselector.setSequenceColor();
-        $(this).attr("class", gameselector.colorName);
-    });
-
     $("#btn-check").click(function () {
         //if submited ok
         game.server.sendGuess(gameselector.sequence.join(""))
@@ -366,6 +354,38 @@ $(function () {
             });
     });
     // interface events end
+
+    // drag&drop start
+
+    var $colorPick = $("#gameContainer .colors"),
+        $sequence = $("#gameContainer .line.active");
+
+    $("div", $colorPick).draggable({
+        cancel: "a.ui-icon", 
+        revert: "invalid", 
+        containment: "document",
+        helper: "clone",
+        cursor: "move"
+    });
+    $("div", $sequence).droppable({
+        accept: "#gameContainer .colors div",
+        activeClass: "none",
+        drop: function( event, ui ) {
+            setColor(ui.draggable, $(this));
+        }
+    });
+    function setColor( $color, $position ) {
+        var color = $color.attr("class").split(" ")[0];
+        gameselector.setColor(color);
+
+        var index = $(".line.active div").index($position);
+        gameselector.setOption(index);
+        gameselector.setSequenceColor();
+        $position.attr("class", gameselector.colorName);
+    }
+
+
+    // drag&drop end
 
     // end FrontEnd script
 
