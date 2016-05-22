@@ -15,6 +15,7 @@ namespace AxiomMind.Models
         public int Round { get; set; }
         private string Code { get; set; }
         public string RemainingUsers { get; private set; }
+        public bool HasBot { get; set; }
 
         public Game(HashSet<string> users)
         {
@@ -25,10 +26,12 @@ namespace AxiomMind.Models
             Users = new HashSet<string>();
             CurrentUsersGuessed = new HashSet<string>();
             RemainingUsers = "";
+            HasBot = false;
 
             foreach (var user in users)
             {
-                this.Users.Add(user);
+                if(user != GameHub.BotName)
+                    this.Users.Add(user);
             }
         }
 

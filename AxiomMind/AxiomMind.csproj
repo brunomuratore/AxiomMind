@@ -91,6 +91,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bot\AxiomBot.cs" />
+    <Compile Include="Bot\Genome.cs" />
+    <Compile Include="Bot\ListGenome.cs" />
+    <Compile Include="Bot\MastermindGenome.cs" />
+    <Compile Include="Bot\MasterMindPopulation.cs" />
+    <Compile Include="Bot\Population.cs" />
     <Compile Include="GameHub.cs" />
     <Compile Include="Models\ChatMessage.cs" />
     <Compile Include="Models\ChatRoom.cs" />

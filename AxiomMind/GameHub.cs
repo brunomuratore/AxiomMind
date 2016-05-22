@@ -1,4 +1,5 @@
-﻿using AxiomMind.Models;
+﻿using AxiomMind.Bot;
+using AxiomMind.Models;
 using Microsoft.AspNet.SignalR;
 using System;
 using System.Collections.Concurrent;
@@ -17,6 +18,8 @@ namespace AxiomMind
         public static readonly ConcurrentDictionary<string, string> _userRooms = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public static readonly ConcurrentDictionary<string, ChatRoom> _rooms = new ConcurrentDictionary<string, ChatRoom>(StringComparer.OrdinalIgnoreCase);
         public static readonly ConcurrentDictionary<string, Game> _games = new ConcurrentDictionary<string, Game>();
+
+        public const string BotName = "AxiomBot";
 
         #region Public Chat
         public bool Join()
@@ -152,6 +155,12 @@ namespace AxiomMind
                 return false;
             }
 
+            if(_rooms[roomName].Users.Contains(BotName) && _rooms[roomName].Users.Count > 2)
+            {
+                SendError("You can only start a match with the Bot if you are alone in the room.");
+                return false;
+            }
+
             Game game = new Game(_rooms[roomName].Users);
 
             if (!_games.TryAdd(game.Guid, game))
@@ -164,7 +173,10 @@ namespace AxiomMind
             {
                 foreach (var user in _rooms[roomName].Users)
                 {
-                    _users[user].CurrentGame = game.Guid;
+                    if (user == BotName)
+                        game.HasBot = true;
+                    else
+                        _users[user].CurrentGame = game.Guid;
                 }
             }
 
@@ -238,12 +250,16 @@ namespace AxiomMind
                             return true;
                         }
                         Guess(name, room, parts[1]);
-
                         return true;
                     }
                     else if (commandName.Equals("leaveGame", StringComparison.OrdinalIgnoreCase))
                     {
                         LeaveGame(name, room);
+                        return true;
+                    }
+                    else if (commandName.Equals("hint", StringComparison.OrdinalIgnoreCase))
+                    {
+                        GiveHint(name, room);
                         return true;
                     }
                 }
@@ -413,6 +429,11 @@ namespace AxiomMind
 
         #region Private Game
 
+        private void GiveHint(string name, string room)
+        {
+            throw new NotImplementedException();
+        }
+
         private void StartRound(int roundNumber, string roomName)
         {
             Clients.Group(roomName).addMessage(0, "AxiomMind", $"");
@@ -527,12 +548,24 @@ namespace AxiomMind
                     if (result.Exactly == 8)
                         winners.Add(result.UserName);
                     Clients.Client(recipientId).guessResult(result.Guess, result.Near, result.Exactly);
+                    if(game.HasBot)
+                    {
+                        SendGuessToBot(game.Round, result);
+                    }
                 }
             }
             if (winners.Count == 0)
                 StartRound(game.Round, room);
             else
                 EndGame(winners, room, game);
+        }
+
+        private void SendGuessToBot(int round, GuessResult result)
+        {
+            AxiomBot bot = new AxiomBot();
+            var rowIndex = round - 2;
+
+            bot.SetResult(rowIndex, result);
         }
         #endregion
 
