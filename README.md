@@ -87,8 +87,9 @@ The client is a web page, made with Html, CSS, jQuery and jQueryUI. It also cont
 
 AxiomBot connects itself as a client in the game. But the algorithm to calculate the hints run in the server.
 
-The algorithm was created based on [Mike Gold's genetic algorithm](http://www.c-sharpcorner.com/article/mastermind-computer-player-using-genetic-algorithms-in-C-Sharp/).
-His method was designed for 4 positions instead of 8, and has been ported to our server, modified and tweeked in order to handle our MasterMind game.
+Since Donald Knuth's classic algorithm would not be able to handle 8 positions with 8 colors, we moved to a genetic implementation.
+
+Our algorithm was created inspired on [Mike Gold's genetic algorithm](http://www.c-sharpcorner.com/article/mastermind-computer-player-using-genetic-algorithms-in-C-Sharp/).
 
 It works by starting with an initial guess, and then based on previous results, mutations are applied on the previous guess, and for each mutation (2000 for each hint) we determine a score for it based on past results, and suggests the mutation with maximum score for the player.
 
