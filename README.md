@@ -88,3 +88,5 @@ The algorithm was created based on [Mike Gold's genetic algorithm](http://www.c-
 His method was designed for 4 positions instead of 8, and has been ported to our server, modified and tweeked in order to handle our MasterMind game.
 
 It works by starting with an initial guess, and then based on previous results, mutations are applied on the previous guess, and for each mutation (2000 for each hint) we determine a score for it based on past results, and suggests the mutation with maximum score for the player.
+
+Usually it takes 8~20 (avg: 14) rounds for the bot correctly guess the code. It is good for finding 6~7 exact matches, but it is not so good on finding the final code. The next improvement would be change the current algorithm for when we have enough good guesses (6 and 7 exact matches) to use a more naive solution instead of genetics, since the code can already be computed.
