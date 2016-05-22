@@ -225,6 +225,35 @@ $(function () {
         //guess = string
         //near = int, number of near tags
         //exact = int, number of exact tags
+        $(".history").prepend($(".hidden .line").clone());
+
+        for (var i = 0; i < gameselector.sequence.length; i++) {
+            $(".history .line")
+              .children().eq(i)
+              .attr(
+                "class",
+                gameselector.colors[gameselector.sequence[i]]
+              );
+        }
+        for (var i = 0; i < exact; i++) {
+            $(".history .line .result")
+              .children().eq(i)
+              .attr(
+                "class",
+                "black border"
+              );
+        }
+        for (var i = exact; i < near + exact; i++) {
+            $(".history .line .result")
+                .children().eq(i)
+                .attr(
+                "class",
+                "white border"
+                );
+        }
+
+        $(".line.active div").attr("class", "white");
+        gameselector.reset();
     };
 
     game.client.endGame = function (winners) {
@@ -235,7 +264,7 @@ $(function () {
     // start FrontEnd script
     class GameSelector {
         constructor() {
-            this.colors = ["white", "red", "yellow", "orange", "green", "lightblue", "blue", "purple", "pink"];
+            this.colors = ["white", "red", "orange", "yellow", "green", "lightblue", "blue", "purple", "pink"];
             this.sequence = [0, 0, 0, 0, 0, 0, 0, 0];
             this.colorName = "none";
             this.colorIndex = 0;
@@ -276,18 +305,12 @@ $(function () {
 
     $("#btn-check").click(function () {
         //if submited ok
-        $(".history").prepend($(".hidden .line").clone());
-
-        for (var i = 0; i < gameselector.sequence.length; i++) {
-            $(".history .line")
-              .children().eq(i)
-              .attr(
-                "class",
-                gameselector.colors[gameselector.sequence[i]]
-              );
-        }
-        $(".line.active div").attr("class", "white");
-        gameselector.reset();
+        game.server.sendGuess(gameselector.sequence.join(""))
+            .done(function (success) {
+                if (success === false) {
+                    //error message
+                }
+            });
     });
 
     // end FrontEnd script
