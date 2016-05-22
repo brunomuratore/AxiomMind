@@ -369,7 +369,7 @@ namespace AxiomMind
 
         private void SendError(string errorMessage)
         {
-            Clients.Caller.addMessage(0, "AxiomMind", errorMessage);
+            Clients.Caller.addError(0, "AxiomMind", errorMessage);
         }
 
         private bool EnsureUser()
