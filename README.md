@@ -43,4 +43,48 @@ Just press F5 and both a Console application (server) and a web browser (client)
 
 ### 4. Features available
 
-*
+* User can choose it's nick
+* User can chat with other users in the same room
+* User can change rooms
+* User can create a new room
+* User can start a new game with everyone that is inside his room
+* User can play MasterMind game alone
+* User can play MasterMind game with other players (not only just two)
+* User can play Mastermind with the Bot, asking for Hints.
+* User can leave a game in the middle of it
+* A game ends if no user is playing it anymore
+* If a player disconnects in the middle of a game, other players in the game can continue playing without him
+* User can use the chat or the UI for every action available.
+
+
+### 5. Technical details - Challeng One
+
+To build the multiplayer game MasterMind, we used C# within Visual Studio as our back end server. The communication between server and client was done using [SignalR](http://www.asp.net/signalr). SignalR relies on WebSockets for its communication with the client, that can be written in any language that supports SignalR. 
+
+The server is a [OWIN](http://owin.org/) self hosted application and runs as a console application.
+
+All game logic is contained in the server. The user can request for the following actions:
+* Connect to the server
+* Change is nickname
+* Join/Create a Room
+* Start a game
+* Leave a game
+* Ask for a hint
+* Disconnect from the server
+
+All validation are made on server, and the result is sent back to client.
+
+### 6. Technical details - Challeng Two
+
+The client is a web page, made with Html, CSS, jQuery and jQueryUI. It also contains references to SignalR JavaScript client in order to communicate with the server. The communication will be done using webSockets, and if your browser don't support it, another protocol will be used instead.
+
+
+### 7. Technical details - Challeng Three
+
+
+AxiomBot connects itself as a client in the game. But the algorithm to calculate the hints run in the server.
+
+The algorithm was created based on (Mike Gold's genetic algorithm)[http://www.c-sharpcorner.com/article/mastermind-computer-player-using-genetic-algorithms-in-C-Sharp/].
+His method was designed for 4 positions instead of 8, and has been ported to our server, modified and tweeked in order to handle our MasterMind game.
+
+It works by starting with an initial guess, and then based on previous results, mutations are applied on the previous guess, and for each mutation (2000 for each hint) we determine a score for it based on past results, and suggests the mutation with maximum score for the player.
