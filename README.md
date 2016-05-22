@@ -27,6 +27,8 @@ Challenges one and three (back-end) were implemented by Bruno and challenge two 
 
 ### 3. How to setup/run
 
+You can check our video explaining how to run and play the game here: https://youtu.be/6nQF20rv8Wk
+
 AxiomMind was built using [Visual Studio 2015 Community](https://www.visualstudio.com/pt-br/products/visual-studio-community-vs.aspx), and this is the only requirement to run the project.
 
 In order to run the project, open the solution in Visual Studio 2015, right click on 'Solution AxionMind' and go to properties.
