@@ -60,7 +60,7 @@ Just press F5(run) and both a Console application (server) and a web browser (cl
 * User can use the chat or the UI for every action available.
 
 
-### 5. Technical details - Challeng One
+### 5. Technical details - Challenge One
 
 To build the multiplayer game MasterMind, we used C# within Visual Studio as our back-end server. The communication between server and client was done using [SignalR](http://www.asp.net/signalr). SignalR relies on WebSockets for its communication with the client, that can be written in any language that supports SignalR. 
 
@@ -78,18 +78,16 @@ All game logic is contained in the server. The user can request for the followin
 
 All validations are made on server, and the result is sent back to client.
 
-### 6. Technical details - Challeng Two
+### 6. Technical details - Challenge Two
 
 The client is a web page, made with Html, CSS, jQuery and jQueryUI. It also contains references to SignalR JavaScript client in order to communicate with the server. The communication is done using webSockets, and if your browser don't support it, another protocol will be used instead.
 
 
-### 7. Technical details - Challeng Three
+### 7. Technical details - Challenge Three
 
 AxiomBot connects itself as a client in the game. But the algorithm to calculate the hints run in the server.
 
-Since Donald Knuth's classic algorithm would not be able to handle 8 positions with 8 colors, we moved to a genetic implementation.
-
-Our algorithm was created inspired on [Mike Gold's genetic algorithm](http://www.c-sharpcorner.com/article/mastermind-computer-player-using-genetic-algorithms-in-C-Sharp/).
+Since Donald Knuth's classic algorithm would not be able to handle 8 positions with 8 colors, we moved to a genetic implementation inspired on [Mike Gold's genetic algorithm](http://www.c-sharpcorner.com/article/mastermind-computer-player-using-genetic-algorithms-in-C-Sharp/) that needed improvements and tunning to work well against 8 positions and 8 colors.
 
 It works by starting with an initial guess, and then based on previous results, mutations are applied on the previous guess, and for each mutation (2000 for each hint) we determine a score for it based on past results, and suggests the mutation with maximum score for the player.
 
