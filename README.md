@@ -9,8 +9,6 @@
 ##### 5. Technical details - Challenge One
 ##### 6. Technical details - Challenge Two
 ##### 7. Technical details - Challenge Three
-##### 8. Answers for Axiom Zen questions
-
 
 ### 1. Overview
 
@@ -92,8 +90,3 @@ Since Donald Knuth's classic algorithm would not be able to handle 8 positions w
 It works by starting with an initial guess, and then based on previous results, mutations are applied on the previous guess, and for each mutation (2000 for each hint) we determine a score for it based on past results, and suggests the mutation with maximum score for the player.
 
 Usually it takes 8\~20 (avg: 14) rounds for the bot correctly guess the code. It is good for finding 6\~7 exact matches, but it is not so good on finding the final code. The next improvement would be change the current algorithm for when we have enough good guesses (6 and 7 exact matches) to use a more naive solution instead of genetics, since the code can already be computed.
-
-
-### 8. Answers for Axiom Zen questions
-
-You can find the answer for the 3 questions here: https://github.com/brunomuratore/AxiomMind/blob/master/Questions.md
