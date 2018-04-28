@@ -12,7 +12,7 @@
 
 ### 1. Overview
 
-This project was built for Axiom Zen as the challenge we choose from VanHackathon challenge.
+This project is the Winner of VanHackathon 2017 for Axiom Zen challenge.
 Called AxiomMind, it consistsof a full multiplayer game of [MasterMind](https://en.wikipedia.org/wiki/Mastermind_(board_game)).
 It provides a chat interface, a game interface, and a Bot that can help you win the game.
 In our game, we have 8 positions and 8 colors on the game, and there is no round limit for players to guess the code.
@@ -21,7 +21,7 @@ In our game, we have 8 positions and 8 colors on the game, and there is no round
 
 The project was built by [Bruno Muratore](https://www.linkedin.com/in/brunomuratore) and [Felipe Sanchez](https://br.linkedin.com/in/sanchezit/en).
 
-Challenges one and three (back-end) were implemented by Bruno and challenge two (front-end) was implemented by Felipe.
+Challenges one and three (back-end and IA) were implemented by Bruno and challenge two (front-end) was implemented by Felipe.
 
 
 ### 3. How to setup/run
@@ -85,8 +85,8 @@ The client is a web page, made with Html, CSS, jQuery and jQueryUI. It also cont
 
 AxiomBot connects itself as a client in the game. But the algorithm to calculate the hints run in the server.
 
-Since Donald Knuth's classic algorithm would not be able to handle 8 positions with 8 colors, we moved to a genetic implementation inspired on [Mike Gold's genetic algorithm](http://www.c-sharpcorner.com/article/mastermind-computer-player-using-genetic-algorithms-in-C-Sharp/) that needed improvements and tunning to work well against 8 positions and 8 colors.
+Since Donald Knuth's classic algorithm would not be able to handle 8 positions with 8 colors, a genetic algorithm implementation was chosen.
 
-It works by starting with an initial guess, and then based on previous results, mutations are applied on the previous guess, and for each mutation (2000 for each hint) we determine a score for it based on past results, and suggests the mutation with maximum score for the player.
+It works by starting with an initial guess, and then based on previous results, mutations are applied on the previous guess, and for each mutation (2000 for each hint) it determines a score for it based on past results, and suggests the mutation with maximum score for the player.
 
-Usually it takes 8\~20 (avg: 14) rounds for the bot correctly guess the code. It is good for finding 6\~7 exact matches, but it is not so good on finding the final code. The next improvement would be change the current algorithm for when we have enough good guesses (6 and 7 exact matches) to use a more naive solution instead of genetics, since the code can already be computed.
+Usually it takes 8\~20 (avg: 14) rounds for the bot correctly guess the code. It is good for finding 6\~7 exact matches, but it is not so good on finding the final code. The next improvement would be change the current algorithm for when we have enough good guesses (6 and 7 exact matches) to use a more naive solution instead of keep mutating.
