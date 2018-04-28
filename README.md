@@ -13,7 +13,7 @@
 ### 1. Overview
 
 This project is the Winner of VanHackathon 2017 for Axiom Zen challenge.
-Called AxiomMind, it consistsof a full multiplayer game of [MasterMind](https://en.wikipedia.org/wiki/Mastermind_(board_game)).
+Called AxiomMind, it consists of a full multiplayer game of [MasterMind](https://en.wikipedia.org/wiki/Mastermind_(board_game)).
 It provides a chat interface, a game interface, and a Bot that can help you win the game.
 In our game, we have 8 positions and 8 colors on the game, and there is no round limit for players to guess the code.
 
